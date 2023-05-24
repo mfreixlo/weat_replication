@@ -1,123 +1,94 @@
 import numpy as np
-from sympy.utilities.iterables import multiset_permutations
+import itertools
+from scipy import stats
+from scipy.stats.stats import zscore
+import statistics
+
+def cos_similarity( tar, att): 
+    '''
+    Calculates the cosine similarity of the target variable vs the attribute
+    '''
+    score = np.dot(tar, att) / (np.linalg.norm(tar) * np.linalg.norm(att))
+    return score
 
 
-def unit_vector(vec):
-    """
-    Returns unit vector
-    """
-    return vec / np.linalg.norm(vec)
+def mean_cos_similarity( tar, att): 
+    '''
+    Calculates the mean of the cosine similarity between the target and the range of attributes
+    '''
+    mean_cos = np.mean([cos_similarity(tar, attribute) for attribute in att])
+    return mean_cos
 
 
-def cos_sim(v1, v2):
-    """
-    Returns cosine of the angle between two vectors
-    """
-    v1_u = unit_vector(v1)
-    v2_u = unit_vector(v2)
-    return np.clip(np.tensordot(v1_u, v2_u, axes=(-1, -1)), -1.0, 1.0)
+def association( tar, att1, att2):
+    '''
+    Calculates the mean association between a single target and all of the attributes
+    '''
+    association = mean_cos_similarity(tar, att1) - mean_cos_similarity(tar, att2)
+    return association
+
+def differential_association( t1, t2, att1, att2):
+    '''
+    xyz
+    '''
+    diff_association = np.sum([association(tar1, att1, att2) for tar1 in t1]) - \
+                    np.sum([association(tar2, att1, att2) for tar2 in t2])
+    return diff_association
 
 
-def weat_association(W, A, B):
-    """
-    Returns association of the word w in W with the attribute for WEAT score.
-    s(w, A, B)
-    :param W: target words' vector representations
-    :param A: attribute words' vector representations
-    :param B: attribute words' vector representations
-    :return: (len(W), ) shaped numpy ndarray. each rows represent association of the word w in W
-    """
-    return np.mean(cos_sim(W, A), axis=-1) - np.mean(cos_sim(W, B), axis=-1)
+def weat_score( t1, t2, att1, att2):
+    '''
+    Calculates the effect size (d) between the two target variables and the attributes
+    Parameters: 
+        t1 (np.array): first target variable matrix
+        t2 (np.array): second target variable matrix
+        att1 (np.array): first attribute variable matrix
+        att2 (np.array): second attribute variable matrix
+    
+    Returns: 
+        effect_size (float): The effect size, d. 
+    
+    Example: 
+        t1 (np.array): Matrix of word embeddings for professions "Programmer, Scientist, Engineer" 
+        t2 (np.array): Matrix of word embeddings for professions "Nurse, Librarian, Teacher" 
+        att1 (np.array): matrix of word embeddings for males (man, husband, male, etc)
+        att2 (np.array): matrix of word embeddings for females (woman, wife, female, etc)
+    '''
+    combined = np.concatenate([t1, t2])
+    num1 = np.mean([association(target, att1, att2) for target in t1]) 
+    num2 = np.mean([association(target, att1, att2) for target in t2]) 
+    combined_association = np.array([association(target, att1, att2) for target in combined])
+    dof = combined_association.shape[0]
+    denom = np.sqrt(((dof-1)*np.std(combined_association, ddof=1) ** 2 ) / (dof-1))
+    effect_size = (num1 - num2) / denom
+    return effect_size
 
 
-def weat_differential_association(X, Y, A, B):
-    """
-    Returns differential association of two sets of target words with the attribute for WEAT score.
-    s(X, Y, A, B)
-    :param X: target words' vector representations
-    :param Y: target words' vector representations
-    :param A: attribute words' vector representations
-    :param B: attribute words' vector representations
-    :return: differential association (float value)
-    """
-    return np.sum(weat_association(X, A, B)) - np.sum(weat_association(Y, A, B))
 
+def weat_p_value( t1, t2, att1, att2): 
+    '''
+    calculates the p value associated with the weat test
+    '''
+    diff_association = differential_association(t1, t2, att1, att2)
+    target_words = np.concatenate([t1, t2])
+    np.random.shuffle(target_words)
 
-def weat_p_value(X, Y, A, B):
-    """
-    Returns one-sided p-value of the permutation test for WEAT score
-    CAUTION: this function is not appropriately implemented, so it runs very slowly
-    :param X: target words' vector representations
-    :param Y: target words' vector representations
-    :param A: attribute words' vector representations
-    :param B: attribute words' vector representations
-    :return: p-value (float value)
-    """
-    diff_association = weat_differential_association(X, Y, A, B)
-    target_words = np.concatenate((X, Y), axis=0)
+    # check if join of t1 and t2 have even number of elements, if not, remove last element
+    if target_words.shape[0] % 2 != 0:
+        target_words = target_words[:-1]
 
-    # get all the partitions of X union Y into two sets of equal size.
-    idx = np.zeros(len(target_words))
-    idx[:len(target_words) // 2] = 1
+    partition_differentiation = []
+    for i in range(10000):
+        seq = np.random.permutation(target_words)
+        tar1_words = seq[:len(target_words) // 2]
+        tar2_words = seq[len(target_words) // 2:]
+        partition_differentiation.append(
+            differential_association(tar1_words, tar2_words, att1, att2)
+            )
+            
+    mean = np.mean(partition_differentiation)
+    stdev = np.std(partition_differentiation)
+    p_val = 1 - stats.norm(loc=mean, scale=stdev).cdf(diff_association)
 
-    partition_diff_association = []
-    for i in multiset_permutations(idx):
-        i = np.array(i, dtype=np.int32)
-        partition_X = target_words[i]
-        partition_Y = target_words[1 - i]
-        partition_diff_association.append(weat_differential_association(partition_X, partition_Y, A, B))
-
-    partition_diff_association = np.array(partition_diff_association)
-
-    return np.sum(partition_diff_association > diff_association) / len(partition_diff_association)
-
-
-def weat_score(X, Y, A, B):
-    """
-    Returns WEAT score
-    X, Y, A, B must be (len(words), dim) shaped numpy ndarray
-    CAUTION: this function assumes that there's no intersection word between X and Y
-    :param X: target words' vector representations
-    :param Y: target words' vector representations
-    :param A: attribute words' vector representations
-    :param B: attribute words' vector representations
-    :return: WEAT score
-    """
-
-    x_association = weat_association(X, A, B)
-    y_association = weat_association(Y, A, B)
-
-
-    tmp1 = np.mean(x_association, axis=-1) - np.mean(y_association, axis=-1)
-    tmp2 = np.std(np.concatenate((x_association, y_association), axis=0))
-
-    return tmp1 / tmp2
-
-
-def wefat_p_value(W, A, B):
-    """
-    Returns WEFAT p-value
-    W, A, B must be (len(words), dim) shaped numpy ndarray
-    CAUTION: not implemented yet
-    :param W: target words' vector representations
-    :param A: attribute words' vector representations
-    :param B: attribute words' vector representations
-    :return: WEFAT p-value
-    """
-    pass
-
-
-def wefat_score(W, A, B):
-    """
-    Returns WEFAT score
-    W, A, B must be (len(words), dim) shaped numpy ndarray
-    CAUTION: this function assumes that there's no intersection word between A and B
-    :param W: target words' vector representations
-    :param A: attribute words' vector representations
-    :param B: attribute words' vector representations
-    :return: WEFAT score
-    """
-    tmp1 = weat_association(W, A, B)
-    tmp2 = np.std(np.concatenate((cos_sim(W, A), cos_sim(W, B)), axis=0))
-
-    return np.mean(tmp1 / tmp2)
+    # print("Mean: ", mean, "\n\n", "stdev: ", stdev, "\n\n partition ass: ", partition_differentiation, '\n\n association: ', diff_association, '\n\n p value: ', p_val)
+    return p_val, diff_association, partition_differentiation
