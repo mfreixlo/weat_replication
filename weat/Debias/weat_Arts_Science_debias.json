@@ -1,0 +1,51 @@
+{
+ "Science_Arts_Male_Female": {
+        "Arts words": [
+            "poetry",
+            "art",
+            "shakespeare",
+            "dance",
+            "literature",
+            "novel",
+            "symphony",
+            "drama"
+        ],
+        "Female attributes": [
+            "sister",
+            "mother",
+            "aunt",
+            "grandmother",
+            "daughter",
+            "she",
+            "hers",
+            "her"
+        ],
+        "Male attributes": [
+            "brother",
+            "father",
+            "uncle",
+            "grandfather",
+            "son",
+            "he",
+            "his",
+            "him"
+        ],
+        "Science words": [
+            "science",
+            "technology",
+            "physics",
+            "chemistry",
+            "einstein",
+            "nasa",
+            "experiment",
+            "astronomy"
+        ],
+        "X_key": "Science words",
+        "Y_key": "Arts words",
+        "A_key": "Male attributes",
+        "B_key": "Female attributes",
+        "attributes": "Male attributes vs Female attributes",
+        "method": "weat",
+        "targets": "Science words vs Arts words"
+    }
+}

@@ -1,0 +1,2 @@
+,Data Name,Targets,Attributes,Method,Score,# of target words,# of attribute words,p-value
+0,Math_Arts_Male_Female,Math words vs Arts Words,Male attributes vs Female attributes,weat,-0.8928863538836119,8,8,0.9633722685941293

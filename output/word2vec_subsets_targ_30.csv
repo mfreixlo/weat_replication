@@ -1,0 +1,8 @@
+,Data Name,Targets,Attributes,Method,Score,# of target words,# of attribute words,p-value
+0,EuropeanAmerican_AfricanAmerican_Pleasant_Unpleasant,European American names vs African American names,Pleasant vs Unpleasant,weat,0.6398398114038109,22,25,0.016437261282253868
+1,EuropeanAmerican_AfricanAmerican_Pleasant_Unpleasant_2,European American names vs African American names,Pleasant vs Unpleasant,weat,1.143381080168315,12,33,0.0026567871035729773
+2,Flowers_Insects_Pleasant_Unpleasant,Flowers vs Insects,Pleasant vs Unpleasant,weat,1.5027436452883989,18,25,2.8328496887164434e-06
+3,Male_Female_Career_Family,Male names vs Female names,Career words vs Family words,weat,1.6061585943084562,6,8,0.002810036743208788
+4,Math_Arts_Male_Female,Math words vs Arts Words,Male attributes vs Female attributes,weat,0.9668188674051571,6,8,0.0461422891218648
+5,MusicalInstruments_Weapons_Pleasant_Unpleasant,Musical instruments vs Weapons,Pleasant vs Unpleasant,weat,1.7146273591214343,18,25,1.3199382964401707e-07
+6,Science_Arts_Male_Female,Science words vs Arts words,Male attributes vs Female attributes,weat,0.8368860142006536,6,8,0.0733950290718044

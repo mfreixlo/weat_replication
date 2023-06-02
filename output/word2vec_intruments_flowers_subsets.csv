@@ -1,7 +1,0 @@
-,Data Name,Targets,Attributes,Method,Score,# of target words,# of attribute words,p-value
-0,Flowers_Insects_Pleasant_Unpleasant,Flowers vs Insects,Pleasant vs Unpleasant,weat,1.539347466684182,25,25,2.721877556677299e-08
-1,Flowers_Insects_Pleasant_Unpleasant_subset1,Flowers vs Insects,Pleasant vs Unpleasant,weat,1.657514061882582,15,25,2.872799954034555e-06
-2,Flowers_Insects_Pleasant_Unpleasant_subset2,Flowers vs Insects,Pleasant vs Unpleasant,weat,1.4669659717296117,15,25,4.084079843258426e-05
-3,MusicalInstruments_Weapons_Pleasant_Unpleasant,Musical instruments vs Weapons,Pleasant vs Unpleasant,weat,1.6219099626540172,24,25,1.0890426005438769e-08
-4,MusicalInstruments_Weapons_Pleasant_Unpleasant_subset1,Musical instruments vs Weapons,Pleasant vs Unpleasant,weat,1.7083072105951234,15,25,1.5839074510859419e-06
-5,MusicalInstruments_Weapons_Pleasant_Unpleasant_subset2,Musical instruments vs Weapons,Pleasant vs Unpleasant,weat,1.4877674050892027,14,25,3.76866037680168e-05

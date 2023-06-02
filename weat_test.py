@@ -1,15 +1,19 @@
+
 import argparse
 import json
 import os
 import pandas as pd
 from tabulate import tabulate
 
-from lib import utils, weat
+import numpy as np
+
+from lib import utils, weat, debias_utils
 
 
 def main(args):
     # define get_word_vectors
-    get_word_vectors = utils.define_get_word_vectors(args)
+    if not args.debias:
+      get_word_vectors, model = utils.define_get_word_vectors(args)
 
     # ready output file
     output_dir = os.path.split(os.path.abspath(args.output))[0]
@@ -23,6 +27,7 @@ def main(args):
     with open(args.weat_path) as f:
         weat_dict = json.load(f)
 
+
         for data_name, data_dict in weat_dict.items():
             if data_dict['method'] == 'weat':
               X_key = data_dict['X_key']
@@ -30,10 +35,52 @@ def main(args):
               A_key = data_dict['A_key']
               B_key = data_dict['B_key']
 
-              X = get_word_vectors(data_dict[X_key])
-              Y = get_word_vectors(data_dict[Y_key])
-              A = get_word_vectors(data_dict[A_key])
-              B = get_word_vectors(data_dict[B_key])
+              if args.debias:
+                model = debias_utils.debias_model(args, data_dict[A_key], \
+                  data_dict[B_key] )
+                get_word_vectors = lambda word: debias_utils.get_word_vectors(model, word)
+
+              if args.subset_targ:
+                Tar1_freq = {}
+                Tar2_freq = {}
+                for tar_X, tar_Y in zip(data_dict[X_key], data_dict[Y_key]):
+                  if tar_X in model:
+                    Tar1_freq[tar_X] = model.get_vecattr(tar_X, "count")
+                  else:
+                    Tar1_freq[tar_X] = 0
+                  if tar_Y in model:
+                    Tar2_freq[tar_Y] = model.get_vecattr(tar_Y, "count")
+                  else:
+                    Tar2_freq[tar_Y] = 0
+
+                remove_nb = np.floor(len(Tar1_freq)*0.2)
+                X_words = sorted(Tar1_freq, reverse = True)[:-int(remove_nb)]
+                Y_words = sorted(Tar2_freq, reverse = True)[:-int(remove_nb)]
+
+                X = get_word_vectors(X_words)
+                Y = get_word_vectors(Y_words)
+
+              else:
+                X = get_word_vectors(data_dict[X_key])
+                Y = get_word_vectors(data_dict[Y_key])
+
+              if args.subset_att:
+                Att1_freq = {}
+                Att2_freq = {}
+                for att_A, att_B in zip(data_dict[A_key], data_dict[B_key]):
+                  Att1_freq[att_A] = model.get_vecattr(att_A, "count")
+                  Att2_freq[att_B] = model.get_vecattr(att_B, "count")
+                
+                remove_nb = np.floor(len(Att1_freq)*0.2)
+                A_words = sorted(Att1_freq, reverse = True)[:-int(remove_nb)]
+                B_words = sorted(Att2_freq, reverse = True)[:-int(remove_nb)]
+
+                A = get_word_vectors(A_words)
+                B = get_word_vectors(B_words)
+
+              else:
+                A = get_word_vectors(data_dict[A_key])
+                B = get_word_vectors(data_dict[B_key])
 
               X, Y = utils.balance_word_vectors(X, Y)
               A, B = utils.balance_word_vectors(A, B)
@@ -87,6 +134,12 @@ if __name__ == '__main__':
                         help='Path of output file (CSV formatted WEAT score)')
     parser.add_argument('--tf_hub', type=str, required=False,
                         help='Tensorflow Hub URL (ignored when word_embedding_type is not \'tf_hub\')')
+    parser.add_argument('--debias', action="store_true",
+                        help='Test WEAT for debiased model')
+    parser.add_argument('--subset_targ', action="store_true",
+                        help='Test WEAT for subset of target words')
+    parser.add_argument('--subset_att', action="store_true",
+                        help='Test WEAT for subset of attribute words')
 
     args = parser.parse_args()
     print('Arguments:')

@@ -1,0 +1,51 @@
+{
+    "Male_Female_Career_Family": {
+        "Career words": [
+            "executive",
+            "management",
+            "professional",
+            "corporation",
+            "salary",
+            "office",
+            "business",
+            "career"
+        ],
+        "Family words": [
+            "home",
+            "parents",
+            "children",
+            "family",
+            "cousins",
+            "marriage",
+            "wedding",
+            "relatives"
+        ],
+        "Female names": [
+            "amy",
+            "joan",
+            "lisa",
+            "sarah",
+            "diana",
+            "kate",
+            "ann",
+            "donna"
+        ],
+        "Male names": [
+            "john",
+            "paul",
+            "mike",
+            "kevin",
+            "steve",
+            "greg",
+            "jeff",
+            "bill"
+        ],
+        "A_key": "Career words",
+        "B_key": "Family words",
+        "X_key": "Male names",
+        "Y_key": "Female names",
+        "attributes": "Career words vs Family words",
+        "method": "weat",
+        "targets": "Male names vs Female names"
+    }
+}

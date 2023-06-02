@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def word2vec_define_get_word_vectors(args):
     """
     Returns 'get_word_vectors' function for word2vec
@@ -23,7 +22,7 @@ def word2vec_define_get_word_vectors(args):
         words = [w for w in words if w in model]
         return model[words]
 
-    return get_word_vectors
+    return get_word_vectors, model
 
 
 def glove_define_get_word_vectors(args):
@@ -101,7 +100,7 @@ def define_get_word_vectors(args):
     """
 
     if args.word_embedding_type == 'word2vec':
-        return word2vec_define_get_word_vectors(args)
+      return word2vec_define_get_word_vectors(args)
 
     elif args.word_embedding_type == 'glove':
         return glove_define_get_word_vectors(args)

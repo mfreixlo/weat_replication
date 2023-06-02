@@ -1,0 +1,2 @@
+,Data Name,Targets,Attributes,Method,Score,# of target words,# of attribute words,p-value
+0,Flowers_Insects_Pleasant_Unpleasant,Flowers vs Insects,Pleasant vs Unpleasant,weat,-1.0513019872113323,25,25,0.9999089208146157

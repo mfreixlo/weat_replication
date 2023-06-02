@@ -1,0 +1,2 @@
+,Data Name,Targets,Attributes,Method,Score,# of target words,# of attribute words,p-value
+0,Male_Female_Career_Family,Male names vs Female names,Career words vs Family words,weat,-0.6706380176590359,8,8,0.9119923364963289
