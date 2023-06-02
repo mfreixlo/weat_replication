@@ -48,8 +48,7 @@ For these experiments, it is needed to install the package allennlp:
 ```
 
 
-For each set of attributes we need to debias the models, we created the needed files, for each of the experiments, and they can be found in the [weat/Debias](https://github.com/mfreixlo/weat_replication/tree/master/weat) folder.
-
+For each set of attributes we need to debias the models, we created the needed files, for each of the experiments, and they can be found in the [weat/Debias](https://github.com/mfreixlo/weat_replication/tree/master/weat/Debias) folder
 
 Here we just give the example for testing the WEAT score for the Arts/Maths targets after debiasing the model, considering the male/female attributes.
 
